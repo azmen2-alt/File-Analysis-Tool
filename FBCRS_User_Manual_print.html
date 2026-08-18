@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>FBCRS Analyzer User Manual</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <style>
+@page { size: Letter; margin: 6.9mm 24.9mm 9mm 12.7mm; }
+body {
+  font-family: Georgia, "Bitstream Charter", serif;
+  font-size: 12.0pt;
+  line-height: 1.5;
+  color: #000;
+  margin: 0;
+}
+h1 { font-size: 16.5pt; font-weight: bold; line-height: 1.3; margin: 0 0 9.0pt 0; }
+h2 { font-size: 13.5pt; font-weight: bold; line-height: 1.3; margin: 21.0pt 0 9.0pt 0; page-break-after: avoid; }
+h3 { font-size: 12.0pt; font-weight: bold; line-height: 1.3; margin: 15.75pt 0 6.75pt 0; page-break-after: avoid; }
+p { margin: 0 0 9.75pt 0; }
+a { color: #000; text-decoration: underline; }
+strong { font-weight: bold; }
+em { font-style: italic; }
+ul, ol { margin: 0 0 9.75pt 0; padding-left: 21.75pt; }
+li { margin-bottom: 5.25pt; }
+hr { border: none; border-top: 0.6pt solid #bbb; margin: 15.0pt 0; }
+code {
+  font-family: Consolas, "Liberation Mono", monospace;
+  font-size: 10.5pt;
+  border: 0.6pt solid #c4c4c4;
+  border-radius: 3.0pt;
+  padding: 0 2.25pt;
+}
+pre {
+  font-family: Consolas, "Liberation Mono", monospace;
+  font-size: 10.5pt;
+  line-height: 1.5;
+  border: 0.6pt solid #c4c4c4;
+  border-radius: 5.25pt;
+  padding: 9.0pt 11.25pt;
+  margin: 0 0 11.25pt 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  page-break-inside: avoid;
+}
+pre code { border: none; border-radius: 0; padding: 0; font-size: 10.5pt; }
+table { border-collapse: collapse; width: 100%; margin: 3.0pt 0 12.75pt 0; page-break-inside: avoid; }
+th { font-weight: bold; text-align: left; padding: 5.25pt 11.25pt 5.25pt 0; border-bottom: 0.75pt solid #888; }
+td { padding: 6.0pt 11.25pt 6.0pt 0; border-bottom: 0.6pt solid #dcdcdc; vertical-align: top; }
+th:first-child, td:first-child { padding-left: 0; }
+th:last-child, td:last-child { padding-right: 0; }
+blockquote { margin: 0 0 11.25pt 0; padding: 1.5pt 0 1.5pt 11.25pt; border-left: 2.25pt solid #333; page-break-inside: avoid; }
+blockquote p { margin: 0 0 6.0pt 0; }
+blockquote p:last-child { margin-bottom: 0; }
+
+code, pre { }
+
+</style>
+</head>
+<body>
+
+<h1 id="fbcrs-document-analysis--recommendation-engine">FBCRS Document
+Analysis &amp; Recommendation Engine</h1>
+<h2 id="user-manual--version-85">User Manual — Version 8.5</h2>
+<hr />
+<h2 id="contents">Contents</h2>
+<ol type="1">
+<li><a href="#1-what-this-tool-does">What this tool does</a></li>
+<li><a href="#2-what-this-tool-does-not-do">What this tool does
+<em>not</em> do</a></li>
+<li><a href="#3-installation">Installation</a></li>
+<li><a href="#4-quick-start">Quick start</a></li>
+<li><a href="#5-reading-the-report--all-21-columns">Reading the report —
+all 21 columns</a></li>
+<li><a href="#6-how-classification-works">How classification
+works</a></li>
+<li><a href="#7-retention-and-expiry-dates">Retention and expiry
+dates</a></li>
+<li><a href="#8-duplicate-detection">Duplicate detection</a></li>
+<li><a href="#9-the-review-workflow">The review workflow</a></li>
+<li><a href="#10-maintaining-the-rulebook">Maintaining the
+rulebook</a></li>
+<li><a href="#11-performance-tuning">Performance tuning</a></li>
+<li><a href="#12-troubleshooting">Troubleshooting</a></li>
+<li><a href="#13-building-and-sharing-an-exe">Building and sharing an
+.exe</a></li>
+<li><a href="#14-known-limitations">Known limitations</a></li>
+<li><a href="#appendix-a--configuration-reference">Appendix A —
+configuration reference</a></li>
+<li><a href="#appendix-b--file-inventory">Appendix B — file
+inventory</a></li>
+</ol>
+<hr />
+<h2 id="1-what-this-tool-does">1. What this tool does</h2>
+<p>The engine scans a folder of documents and produces an Excel
+inventory that suggests, for each file, which records series it belongs
+to and what should happen to it.</p>
+<p>For every file it reports:</p>
+<ul>
+<li>a <strong>records series code</strong> from your classification
+rulebook, or <code>UNCLASSIFIED</code></li>
+<li>the <strong>retention period</strong> and calculated <strong>expiry
+date</strong></li>
+<li>a <strong>recommended action</strong> — Destroy, Do Nothing, Manual
+Review, or Transfer to Archives</li>
+<li>a <strong>confidence level</strong> and a plain-English explanation
+of why</li>
+<li>whether the file is an exact <strong>duplicate</strong> of another
+file in the scan</li>
+<li>up to three <strong>alternate codes</strong> when the top match is
+uncertain</li>
+</ul>
+<p>It reads inside <code>.docx</code>, <code>.pdf</code>,
+<code>.xlsx</code>, <code>.xlsm</code>, <code>.pptx</code>, and
+<code>.txt</code> files. Other file types are still inventoried, but
+classified on filename alone.</p>
+<hr />
+<h2 id="2-what-this-tool-does-not-do">2. What this tool does
+<em>not</em> do</h2>
+<p>Read this section before acting on any output.</p>
+<p><strong>It does not delete, move, or modify a single file.</strong>
+The tool is read-only. Every action in the report is a
+<em>recommendation</em> for a human to approve. Nothing happens to your
+documents.</p>
+<p><strong><code>DESTROY</code> is a suggestion, never an
+instruction.</strong> Do not run a bulk deletion from this report. Every
+destroy recommendation needs review by someone with the authority to
+approve disposition.</p>
+<p><strong>It does not detect near-duplicates.</strong> Only
+byte-for-byte identical files. Two versions of the same document with a
+one-word change are treated as unrelated.</p>
+<hr />
+<h2 id="3-installation">3. Installation</h2>
+<h3 id="31-what-you-need">3.1 What you need</h3>
+<p>Two files, <strong>in the same folder</strong>:</p>
+<pre><code>C:\FBCRS\
+├── FBCRS_Analyzer.exe          (the application)
+├── FBCRS_Master_Full.xlsx      (the classification rulebook)
+└── repair_rulebook.exe         (rulebook checker - optional)</code></pre>
+<p>The rulebook <strong>must</strong> be named exactly
+<code>FBCRS_Master_Full.xlsx</code> and <strong>must</strong> sit beside
+the program. This is the single most common setup mistake.</p>
+<h3 id="32-where-to-install-it">3.2 Where to install it</h3>
+<p><strong>Install to a local drive — <code>C:\FBCRS\</code> — not a
+network share.</strong></p>
+<p>The program writes temporary checkpoint files thousands of times
+during a scan. Running it from a mapped drive or UNC path
+(<code>Z:\...</code> or <code>\\SERVER\...</code>) causes intermittent
+"Access is denied" failures partway through a scan, and is dramatically
+slower. You can <em>scan</em> network folders; just don't <em>run</em>
+from one.</p>
+<h3 id="33-python-setup-skip-if-using-the-exe">3.3 Python setup (skip if
+using the .exe)</h3>
+<p>Requires Python 3.10 or later. Install the dependencies once:</p>
+<pre><code>pip install customtkinter openpyxl pypdf python-docx python-pptx</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th>Package</th>
+<th>Needed for</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>customtkinter</code></td>
+<td>the interface — <strong>required</strong></td>
+</tr>
+<tr class="even">
+<td><code>openpyxl</code></td>
+<td>reading the rulebook and writing reports —
+<strong>required</strong></td>
+</tr>
+<tr class="odd">
+<td><code>pypdf</code></td>
+<td>reading inside PDF files — optional</td>
+</tr>
+<tr class="even">
+<td><code>python-docx</code></td>
+<td>reading inside Word files — optional</td>
+</tr>
+<tr class="odd">
+<td><code>python-pptx</code></td>
+<td>reading inside PowerPoint files — optional</td>
+</tr>
+</tbody>
+</table>
+<p>The three optional packages degrade gracefully. Without
+<code>pypdf</code>, for example, PDFs are still inventoried and
+classified on filename, just not on content.</p>
+<h3 id="34-where-reports-are-saved">3.4 Where reports are saved</h3>
+<p>Automatically, to the current user's Documents folder:</p>
+<pre><code>C:\Users\&lt;YourName&gt;\Documents\FBCRS_Reports\</code></pre>
+<p>This is resolved at runtime, so on a colleague's machine it saves to
+<em>their</em> Documents folder. If Documents isn't writable, the
+program falls back to <code>%LOCALAPPDATA%\FBCRS_Reports</code>, then to
+the system temp folder. The active path is displayed in small grey text
+at the bottom of the window.</p>
+<hr />
+<h2 id="4-quick-start">4. Quick start</h2>
+<ol type="1">
+<li><p><strong>Close the rulebook.</strong>
+<code>FBCRS_Master_Full.xlsx</code> must not be open in Excel. Excel
+locks the file and the program will refuse to start.</p></li>
+<li><p><strong>Launch.</strong> Double-click
+<code>FBCRS_Analyzer.exe</code>. If you are running from source instead,
+use:</p>
+<pre><code>python C:\FBCRS\FBCRS_Record_Inventory_V8_5.py</code></pre></li>
+<li><p><strong>Click "Browse Folder"</strong> and choose the folder to
+scan. Subfolders are included automatically.</p></li>
+<li><p><strong>Click "Start Analysis."</strong> The status line reports
+progress as <code>Scanning files: 1,240 / 8,900</code>.</p></li>
+<li><p><strong>Wait.</strong> The report opens in Excel automatically
+when finished, and a summary dashboard shows elapsed time, files found,
+and files classified.</p></li>
+</ol>
+<h3 id="first-run-advice">First run advice</h3>
+<p><strong>Start with 30–50 files you already know the answers
+for.</strong> This tells you whether the rulebook is tuned correctly for
+your content before you commit to a multi-hour scan. Check the
+<strong>Confidence Reason</strong> column on those known files — if it
+says the match came from generic terms, the rulebook needs work, not the
+folder.</p>
+<hr />
+<h2 id="5-reading-the-report--all-21-columns">5. Reading the report —
+all 21 columns</h2>
+<p>The report has one sheet, <code>Inventory</code>, with the top row
+frozen and filters enabled. A hidden sheet named <code>Lists</code>
+holds the dropdown values — leave it alone unless you're deliberately
+editing the vocabularies.</p>
+<h3 id="identification">Identification</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Col</th>
+<th>Header</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>A</strong></td>
+<td>File Name</td>
+<td>Filename with extension</td>
+</tr>
+<tr class="even">
+<td><strong>B</strong></td>
+<td>Extension</td>
+<td>Lowercase extension, e.g. <code>.docx</code></td>
+</tr>
+<tr class="odd">
+<td><strong>C</strong></td>
+<td>Content Category</td>
+<td><code>Document</code>, <code>Spreadsheet</code>, <code>PDF</code>,
+or <code>Other</code></td>
+</tr>
+<tr class="even">
+<td><strong>D</strong></td>
+<td>Date Created</td>
+<td>From the filesystem</td>
+</tr>
+<tr class="odd">
+<td><strong>E</strong></td>
+<td>Date Modified</td>
+<td>From the filesystem — <strong>drives the expiry
+calculation</strong></td>
+</tr>
+<tr class="even">
+<td><strong>O</strong></td>
+<td>Full File Path</td>
+<td>Complete path, clickable hyperlink</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note on Date Created:</strong> Windows resets creation dates
+when files are copied or moved. A 2011 record copied to a new share in
+2024 will show as created in 2024. Treat this column as unreliable for
+anything legal.</p>
+</blockquote>
+<h3 id="classification">Classification</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Col</th>
+<th>Header</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>F</strong></td>
+<td>Code</td>
+<td>Records series code, <code>UNCLASSIFIED</code>, or <code>N/A</code>
+for skipped files</td>
+</tr>
+<tr class="even">
+<td><strong>G</strong></td>
+<td>Series Title</td>
+<td>Series name from the rulebook</td>
+</tr>
+<tr class="odd">
+<td><strong>Q</strong></td>
+<td>Confidence</td>
+<td><code>Very High</code> / <code>High</code> / <code>Medium</code> /
+<code>Low</code> — <strong>editable dropdown</strong></td>
+</tr>
+<tr class="even">
+<td><strong>R</strong></td>
+<td>Confidence Reason</td>
+<td>Plain-English explanation of the confidence level</td>
+</tr>
+<tr class="odd">
+<td><strong>S–U</strong></td>
+<td>Alternate Code 1–3</td>
+<td>Runner-up codes, when genuinely competitive</td>
+</tr>
+</tbody>
+</table>
+<h3 id="retention-and-disposition">Retention and disposition</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Col</th>
+<th>Header</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>H</strong></td>
+<td>Retention Period</td>
+<td>Raw retention text from the rulebook, e.g.
+<code>CCY + 2 years</code></td>
+</tr>
+<tr class="even">
+<td><strong>I</strong></td>
+<td>Retention Expiry Date</td>
+<td>Calculated date, or blank if it couldn't be determined</td>
+</tr>
+<tr class="odd">
+<td><strong>J</strong></td>
+<td>Disposition</td>
+<td>Raw disposition text from the rulebook</td>
+</tr>
+<tr class="even">
+<td><strong>K</strong></td>
+<td>Recommended Action</td>
+<td><strong>Editable dropdown</strong> — the decision to act on</td>
+</tr>
+<tr class="odd">
+<td><strong>L</strong></td>
+<td>Reason</td>
+<td><strong>Editable dropdown</strong> — why that action was
+recommended</td>
+</tr>
+</tbody>
+</table>
+<h3 id="review-flags">Review flags</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Col</th>
+<th>Header</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>M</strong></td>
+<td>Duplicate Detected</td>
+<td><code>YES</code> if an identical file appeared earlier in the
+scan</td>
+</tr>
+<tr class="even">
+<td><strong>N</strong></td>
+<td>SME Review Required</td>
+<td><code>YES</code> for low-confidence or unclassified files</td>
+</tr>
+<tr class="odd">
+<td><strong>P</strong></td>
+<td>Comments</td>
+<td>Error details, skip reasons, and other notes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-three-dropdown-columns">The three dropdown columns</h3>
+<p>Columns <strong>K</strong>, <strong>L</strong>, and
+<strong>Q</strong> are constrained dropdowns. Typing anything not on the
+list is rejected. Validation extends 500 rows past your data, so pasting
+in more rows keeps the dropdowns working.</p>
+<p><strong>Column K — Recommended Action</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>DESTROY</code></td>
+<td>Retention has lapsed, or the file is an exact duplicate or
+empty</td>
+</tr>
+<tr class="even">
+<td><code>DO NOTHING</code></td>
+<td>Still within its retention period — leave it alone</td>
+</tr>
+<tr class="odd">
+<td><code>MANUAL REVIEW REQUIRED</code></td>
+<td>The engine could not decide; a person must</td>
+</tr>
+<tr class="even">
+<td><code>TRANSFER TO ARCHIVES</code></td>
+<td>The rulebook disposition calls for archival transfer</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Column L — Reason</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>WITHIN RETENTION</code></td>
+<td>Expiry date is in the future</td>
+</tr>
+<tr class="even">
+<td><code>PASSED RETENTION</code></td>
+<td>Expiry date has passed</td>
+</tr>
+<tr class="odd">
+<td><code>DUPLICATE</code></td>
+<td>Byte-identical to a file seen earlier in this scan</td>
+</tr>
+<tr class="even">
+<td><code>EMPTY/DRAFT</code></td>
+<td>Zero bytes, or a temporary Office lock file (<code>~$…</code>)</td>
+</tr>
+<tr class="odd">
+<td><code>UNSUPPORTED FORMAT</code></td>
+<td>File type that cannot contain records (image, video, archive)</td>
+</tr>
+<tr class="even">
+<td><code>MISSING DISPOSITION RULE</code></td>
+<td>Retention lapsed but the rulebook has no disposition for that
+code</td>
+</tr>
+<tr class="odd">
+<td><code>NEEDS REVIEW</code></td>
+<td>Not confidently classified, or unreadable</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Column Q — Confidence</strong></p>
+<p><code>Very High</code>, <code>High</code>, <code>Medium</code>,
+<code>Low</code>. Editable so a reviewer can record their own assessment
+after inspecting a file.</p>
+<h3 id="order-of-precedence">Order of precedence</h3>
+<p>When several rules could apply, the first match wins:</p>
+<ol type="1">
+<li><strong>Duplicate</strong> → <code>DESTROY</code> /
+<code>DUPLICATE</code></li>
+<li><strong>Unclassified</strong> → <code>MANUAL REVIEW REQUIRED</code>
+/ <code>NEEDS REVIEW</code></li>
+<li><strong>Expired, disposition known</strong> → the rulebook's
+disposition / <code>PASSED RETENTION</code></li>
+<li><strong>Expired, no disposition</strong> →
+<code>MANUAL REVIEW REQUIRED</code> /
+<code>MISSING DISPOSITION RULE</code></li>
+<li><strong>Low confidence</strong> →
+<code>MANUAL REVIEW REQUIRED</code> / <code>NEEDS REVIEW</code></li>
+<li><strong>Otherwise</strong> → <code>DO NOTHING</code> /
+<code>WITHIN RETENTION</code></li>
+</ol>
+<blockquote>
+<p><strong>Important:</strong> duplicate detection sits at the top. A
+file that is both unclassified <em>and</em> a duplicate is marked
+<code>DESTROY</code>, not sent for review. If you want unclassified
+duplicates reviewed instead, filter on <code>Reason = DUPLICATE</code>
+<strong>and</strong> <code>Code = UNCLASSIFIED</code> before acting.</p>
+</blockquote>
+<hr />
+<h2 id="6-how-classification-works">6. How classification works</h2>
+<h3 id="61-scoring">6.1 Scoring</h3>
+<p>Each file's filename and content are matched against the rulebook's
+keywords and phrases. Points accumulate per records series:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Signal</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Keyword match</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td>Phrase match (multi-word)</td>
+<td>10</td>
+</tr>
+<tr class="odd">
+<td>Match in the <strong>filename</strong></td>
+<td>× 3</td>
+</tr>
+</tbody>
+</table>
+<p>Filenames get triple weight because a filename is a deliberate human
+label, whereas body text is full of boilerplate.</p>
+<p><strong>Rarity weighting.</strong> Each term's points are divided by
+the number of series that claim it. A keyword unique to one series
+contributes its full 2 points; a keyword shared by 20 series contributes
+0.1. This is essential — auto-generated rulebooks tend to contain
+boilerplate terms attached to dozens of codes, which would otherwise
+swamp the real signal.</p>
+<p><strong>Terms shared by more than 20 series are ignored
+entirely</strong> as having no discriminating value.</p>
+<p><strong>Each distinct term counts once per field.</strong> A document
+repeating "financial" 400 times scores no higher than one mentioning it
+once.</p>
+<h3 id="62-confidence-bands">6.2 Confidence bands</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Score</th>
+<th>Confidence</th>
+<th>Typically means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>30 or more</td>
+<td>Very High</td>
+<td>An exact phrase matched in the filename</td>
+</tr>
+<tr class="even">
+<td>12–29</td>
+<td>High</td>
+<td>Several distinctive terms matched</td>
+</tr>
+<tr class="odd">
+<td>4–11</td>
+<td>Medium</td>
+<td>Moderate evidence</td>
+</tr>
+<tr class="even">
+<td>below 4</td>
+<td>Low</td>
+<td>Only weak or generic terms matched</td>
+</tr>
+</tbody>
+</table>
+<p>Confidence is downgraded to <code>Medium</code> when two series score
+within 15% of each other — a near-tie is not high confidence regardless
+of the raw score.</p>
+<h3 id="63-when-the-engine-refuses-to-guess">6.3 When the engine refuses
+to guess</h3>
+<p>A file becomes <code>UNCLASSIFIED</code> if:</p>
+<ul>
+<li><strong>nothing matched</strong> → <em>"No rulebook keywords or
+phrases found — context is not clear"</em></li>
+<li><strong>score below 2</strong> → <em>"Only generic terms matched,
+shared across many series"</em></li>
+<li><strong>score below 6 with no filename support</strong> → <em>"Weak
+match in document body only, nothing in the file name"</em></li>
+</ul>
+<p><strong>Expect a meaningful number of <code>UNCLASSIFIED</code>
+results, and treat that as the tool working correctly.</strong> Refusing
+to guess is the point. A version that assigns a code to everything is
+not more accurate — it just hides its uncertainty, which is far more
+dangerous when the output drives destruction decisions.</p>
+<h3 id="64-alternate-codes-su">6.4 Alternate codes (S–U)</h3>
+<p>Runner-up codes appear only when genuinely competitive: within 40% of
+the winning score, and scoring at least 2 in their own right.</p>
+<p>This means <strong>high-confidence rows usually show no alternates at
+all</strong>, which is intentional. Listing second, third, and fourth
+place unconditionally would hand reviewers three plausible-looking wrong
+answers on every clear match, and people do pick them.</p>
+<p>Alternates are always blank for <code>UNCLASSIFIED</code> files — if
+the top match is noise, so are the runners-up.</p>
+<hr />
+<h2 id="7-retention-and-expiry-dates">7. Retention and expiry dates</h2>
+<h3 id="71-supported-formats">7.1 Supported formats</h3>
+<p>The engine reads two patterns from the rulebook's Retention
+column:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Pattern</th>
+<th>Meaning</th>
+<th>Expiry</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>CCY + N</code></td>
+<td>Current Calendar Year plus N years</td>
+<td>31 December, year + N</td>
+</tr>
+<tr class="even">
+<td><code>CFY + N</code></td>
+<td>Current Fiscal Year plus N years</td>
+<td>31 March, fiscal year end + N</td>
+</tr>
+</tbody>
+</table>
+<p>Fiscal year is treated as April–March: files modified January to
+March fall in the fiscal year ending that same calendar year; April
+onwards fall in the fiscal year ending the next.</p>
+<p>Surrounding text is ignored, so <code>CCY + 2 years</code>,
+<code>CCY+2</code>, and <code>ccy + 2</code> all parse identically.</p>
+<h3 id="72-important-limitations">7.2 Important limitations</h3>
+<p><strong>Expiry is calculated from Date Modified.</strong> Records
+retention normally runs from file <em>closure</em> — case closed,
+project completed, employee departed — which the filesystem does not
+know. A file edited last week shows a retention clock that started last
+week, regardless of the underlying record's actual age.</p>
+<p><strong>Retention text the engine can't parse produces no expiry
+date.</strong> Entries like <code>Within a maximum of 1 month</code> or
+<code>Superseded + 1</code> are left blank, and the file is reported as
+<code>WITHIN RETENTION</code> — indefinitely. Blank expiry dates are not
+a guarantee of currency; they mean <em>unknown</em>. Filter on blank
+column I to find these.</p>
+<p><strong>Decimals are truncated.</strong> <code>CCY+0.3</code> parses
+as <code>CCY+0</code>, giving an expiry of 31 December in the year the
+file was modified. Review any rulebook entries with fractional
+retention.</p>
+<hr />
+<h2 id="8-duplicate-detection">8. Duplicate detection</h2>
+<h3 id="81-how-it-works">8.1 How it works</h3>
+<p>Duplicates are found in two stages. First, file
+<strong>sizes</strong> are compared — identical files must have
+identical sizes, so this eliminates almost everything without reading
+any file content. Only files whose size collides with another are then
+<strong>hashed</strong> (SHA-256 over the first 5 MB).</p>
+<p>This is why scans are fast: on a typical folder, only a small
+percentage of files are ever opened for hashing.</p>
+<h3 id="82-which-copy-gets-flagged">8.2 Which copy gets flagged</h3>
+<p>Files are processed in sorted path order, and <strong>the first copy
+encountered is kept</strong>; later copies are marked
+<code>DUPLICATE</code> / <code>DESTROY</code>. This is deterministic —
+re-scanning the same folder flags the same copies every time.</p>
+<blockquote>
+<p><strong>"First in sorted order" is alphabetical, not a judgement
+about which copy is the real record.</strong>
+<code>Archive\report.docx</code> sorts before
+<code>Current\report.docx</code>, so the archived copy would be kept and
+the current one marked for destruction. Always confirm which copy you
+actually want before acting on a duplicate.</p>
+</blockquote>
+<h3 id="83-what-is-not-detected">8.3 What is not detected</h3>
+<ul>
+<li><strong>Near-duplicates.</strong> One changed word makes two files
+unrelated to this tool.</li>
+<li><strong>Files differing beyond the first 5 MB.</strong> Two large
+files with identical first 5 MB and identical total size are reported as
+duplicates. Rare, but possible with padded or templated files.</li>
+<li><strong>Duplicates among skipped types.</strong> Images, videos, and
+archives are never hashed, so identical copies of them are not
+flagged.</li>
+<li><strong>Duplicates across separate scans.</strong> Detection is
+per-scan only.</li>
+</ul>
+<hr />
+<h2 id="9-the-review-workflow">9. The review workflow</h2>
+<p>A practical order for working through a report.</p>
+<p><strong>Step 1 — Fix the plumbing first.</strong> Filter column P
+(Comments) for <code>ACCESS DENIED</code> and <code>Scan failed</code>.
+These files were never actually examined. Resolve permissions and
+re-scan before drawing conclusions from the totals.</p>
+<p><strong>Step 2 — Clear the safe wins.</strong> Filter column L for
+<code>EMPTY/DRAFT</code>. Zero-byte files and <code>~$</code> Office
+lock files are genuinely disposable and need little scrutiny.</p>
+<p><strong>Step 3 — Review every <code>DESTROY</code>
+recommendation.</strong> Filter column K for <code>DESTROY</code>. Sort
+by column M so duplicates group together. For each, confirm the copy
+being kept is the one you want. This is where irreversible mistakes
+happen.</p>
+<p><strong>Step 4 — Work the review queue by confidence.</strong> Filter
+column N for <code>YES</code>, then sort column Q ascending so
+<code>Low</code> appears first. Use columns R, S, T, and U — Confidence
+Reason tells you <em>why</em> it's uncertain, and the alternates give
+you candidate codes to pick from instead of searching the full series
+list.</p>
+<p><strong>Step 5 — Find the silent gaps.</strong> Filter for blank
+column I (no expiry date) and for <code>MISSING DISPOSITION RULE</code>.
+These are rulebook problems masquerading as file problems, and they will
+recur on every future scan until fixed in the rulebook.</p>
+<p><strong>Step 6 — Record your decisions in the dropdowns.</strong>
+Override columns K, L, and Q as you review. The constrained vocabularies
+keep the report analysable afterwards — you can pivot it, count it, and
+hand it on.</p>
+<blockquote>
+<p><strong>Keep the original report unedited.</strong> Save your
+reviewed version under a new name. Reports are timestamped, so a re-scan
+won't overwrite anything, but an unedited baseline is worth having.</p>
+</blockquote>
+<hr />
+<h2 id="10-maintaining-the-rulebook">10. Maintaining the rulebook</h2>
+<h3 id="101-structure">10.1 Structure</h3>
+<p><code>FBCRS_Master_Full.xlsx</code> needs four sheets, each with a
+header row:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Sheet</th>
+<th>Column A</th>
+<th>Column B</th>
+<th>Columns C–D</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Records</strong></td>
+<td>Code</td>
+<td>Series Title</td>
+<td>Retention, Disposition</td>
+</tr>
+<tr class="even">
+<td><strong>Keywords</strong></td>
+<td>Code</td>
+<td>Keyword (one per row)</td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>Phrases</strong></td>
+<td>Code</td>
+<td>Phrase (one per row)</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>Synonyms</strong></td>
+<td>Term</td>
+<td>Replacement</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>Additional sheets are ignored, so a <code>FunctionCodes</code>
+reference sheet or similar can live in the same workbook safely.</p>
+<h3 id="102-editing">10.2 Editing</h3>
+<ol type="1">
+<li>Close the app.</li>
+<li>Edit the workbook and save it.</li>
+<li><strong>Save and close the workbook.</strong></li>
+<li>Restart the app — the rulebook is read once at startup.</li>
+</ol>
+<h3 id="103-writing-effective-keywords">10.3 Writing effective
+keywords</h3>
+<p><strong>Specific beats general.</strong> <code>reconciliation</code>
+identifies a series; <code>report</code> identifies nothing. Rarity
+weighting means generic terms contribute almost nothing anyway, so
+they're wasted effort.</p>
+<p><strong>Phrases outperform keywords</strong> — 10 points versus 2,
+and far fewer false positives. <code>key performance indicator</code> is
+worth more than <code>key</code> plus <code>performance</code> plus
+<code>indicator</code> separately.</p>
+<p><strong>Terms are matched as whole words.</strong> <code>plan</code>
+will not match <code>plans</code> or <code>planning</code>. Add each
+form you need. Conversely this is protective: <code>bi</code> matches
+only the standalone word, never the inside of
+<code>liability</code>.</p>
+<p><strong>Never put multi-line content in a Synonyms cell.</strong>
+Each synonym replacement must be a short single-line phrase. A pasted
+block in that column expands into every document the engine reads and
+destroys all classification accuracy — see section 12.</p>
+<h3 id="104-auditing-the-rulebook">10.4 Auditing the rulebook</h3>
+<p><code>repair_rulebook.exe</code> checks a rulebook and reports
+problems.</p>
+<p><strong>Double-click it.</strong> A file dialog opens — select the
+rulebook you want checked. The findings appear in a console window,
+which stays open until you press Enter.</p>
+<p>You can also pass the path directly if you prefer:</p>
+<pre><code>repair_rulebook.exe &quot;C:\FBCRS\FBCRS_Master_Full.xlsx&quot;</code></pre>
+<h3 id="what-it-reports">What it reports</h3>
+<ul>
+<li><strong>Corrupt Synonyms entries</strong> — multi-line or overlong
+replacement values, the fault that makes every file classify as the same
+code</li>
+<li><strong>Over-shared keywords</strong> — terms claimed by so many
+series that they carry no signal, listed worst first</li>
+<li><strong>Over-shared phrases</strong> — the same problem in the
+Phrases sheet</li>
+<li><strong>How many keywords are genuinely distinctive</strong> — owned
+by exactly one series. This is the single best measure of rulebook
+health</li>
+</ul>
+<h3 id="what-it-writes">What it writes</h3>
+<p>Two files, beside the rulebook you selected:</p>
+<table>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>&lt;name&gt;_REPAIRED.xlsx</code></td>
+<td>The cleaned rulebook — <strong>use this one</strong></td>
+</tr>
+<tr class="even">
+<td><code>&lt;name&gt;_AUDIT.txt</code></td>
+<td>The full report, saved so you can keep or circulate it</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The original is never modified.</strong> Records, Keywords,
+and Phrases are copied through untouched; only the Synonyms sheet is
+repaired, and anything removed from it is moved to a
+<code>FunctionCodes</code> sheet rather than deleted, so nothing is
+lost.</p>
+<p>To put a repaired rulebook into service, rename it to
+<code>FBCRS_Master_Full.xlsx</code> and place it beside
+<code>FBCRS_Analyzer.exe</code>.</p>
+<p>Run this whenever you make significant rulebook edits, and any time
+classification quality drops.</p>
+<hr />
+<h2 id="11-performance-tuning">11. Performance tuning</h2>
+<p>Expect roughly <strong>30–40 ms per file</strong> on local storage.
+Network shares are slower and vary with the link.</p>
+<p>If scans are too slow, adjust these constants near the top of the
+script, in this order of impact:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>XLSX_ROWS <span class="op">=</span> <span class="dv">500</span>     <span class="co"># rows read per spreadsheet sheet</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>TEXT_CAP  <span class="op">=</span> <span class="dv">100000</span>  <span class="co"># characters of content fed to the matcher</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>PDF_PAGES <span class="op">=</span> <span class="dv">10</span>      <span class="co"># pages read per PDF</span></span></code></pre></div>
+<p><strong><code>XLSX_ROWS</code> is the biggest lever.</strong> Parsing
+spreadsheets dominates runtime. Dropping it to <code>150</code> roughly
+halves total scan time and rarely changes results — if a spreadsheet's
+subject isn't evident in its first 150 rows and its filename, another
+350 rows seldom help.</p>
+<p>Other settings:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Constant</th>
+<th>Default</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>MAX_WORKERS</code></td>
+<td><code>min(8, cores × 2)</code></td>
+<td>Parallel threads. Raising helps on high-latency shares</td>
+</tr>
+<tr class="even">
+<td><code>MAX_SIZE_BYTES</code></td>
+<td>15 MB</td>
+<td>Files above this are classified on filename only</td>
+</tr>
+<tr class="odd">
+<td><code>HASH_BYTES</code></td>
+<td>5 MB</td>
+<td>Bytes hashed for duplicate comparison</td>
+</tr>
+<tr class="even">
+<td><code>DOCX_PARAS</code></td>
+<td>200</td>
+<td>Paragraphs read per Word file</td>
+</tr>
+<tr class="odd">
+<td><code>PPTX_SLIDES</code></td>
+<td>10</td>
+<td>Slides read per presentation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="general-advice">General advice</h3>
+<ul>
+<li><strong>Run from a local drive.</strong> The single biggest
+factor.</li>
+<li><strong>Break very large directories into sub-folders</strong> and
+scan separately. Reports are named after the folder, so they won't
+collide.</li>
+<li><strong>Scan outside business hours</strong> for large network
+folders.</li>
+</ul>
+<hr />
+<h2 id="12-troubleshooting">12. Troubleshooting</h2>
+<h3 id="fatal-error-missing-rulebook">"Fatal Error: Missing
+Rulebook"</h3>
+<p><code>FBCRS_Master_Full.xlsx</code> is not in the same folder as the
+program. The dialog shows the exact folder being searched. Check for a
+renamed file (<code>FBCRS_Master_Full_REPAIRED.xlsx</code> won't be
+found) or a hidden double extension (<code>.xlsx.xlsx</code>).</p>
+<h3 id="fatal-error-rulebook-read-error">"Fatal Error: Rulebook Read
+Error"</h3>
+<p>Usually the rulebook is open in Excel. Close it. If it persists, the
+file may be corrupt — open it in Excel and re-save.</p>
+<h3 id="access-is-denied-partway-through-a-scan">"Access is denied"
+partway through a scan</h3>
+<p>You're running the program from a network share. Move it to
+<code>C:\FBCRS\</code>. See section 3.2.</p>
+<h3 id="the-output-excel-file-is-open">"The output Excel file is
+open"</h3>
+<p>A previous report is open in Excel. Close it. The program retries
+three times before giving up.</p>
+<h3 id="every-file-gets-the-same-code">Every file gets the same
+code</h3>
+<p>A corrupt <strong>Synonyms</strong> sheet. If a synonym's replacement
+value contains multiple lines or a long block of text, that block gets
+injected into every document the engine reads, so every file matches the
+same series.</p>
+<p>Run <code>repair_rulebook.exe</code> (section 10.4) and use the
+repaired copy. Verify by checking the <strong>Confidence Reason</strong>
+column — if unrelated files all claim to match the same phrase, this is
+the cause.</p>
+<h3 id="nearly-everything-is-unclassified">Nearly everything is
+UNCLASSIFIED</h3>
+<p>Check <strong>Confidence Reason</strong> to distinguish two very
+different situations:</p>
+<ul>
+<li><em>"No rulebook keywords or phrases found"</em> → your rulebook
+lacks terms for this content. Add keywords for the series that actually
+appear in this folder.</li>
+<li><em>"Only generic terms matched"</em> → the rulebook's terms are too
+generic. Add distinctive phrases.</li>
+</ul>
+<p>If review volume is genuinely unmanageable, <code>MIN_SCORE</code>
+and <code>BODY_ONLY_MIN</code> control the thresholds — but read the
+evidence before loosening them. Lowering thresholds doesn't create
+accuracy, it just converts visible uncertainty into invisible
+uncertainty.</p>
+<h3 id="files-are-missing-from-the-report">Files are missing from the
+report</h3>
+<p>Files and folders whose names begin with <code>~</code> or
+<code>.</code> are skipped by design (Office temp files, hidden
+folders). Also check column P for <code>ACCESS DENIED</code>.</p>
+<h3 id="where-to-look-when-nothing-else-explains-it">Where to look when
+nothing else explains it</h3>
+<pre><code>Documents\FBCRS_Reports\FBCRS_error_log.txt</code></pre>
+<p>Full technical tracebacks for any failure, with timestamps. Also
+check for leftover <code>*_temp.csv</code> files in that folder — if a
+scan was interrupted, the partial results survive there and can be
+opened in Excel.</p>
+<hr />
+<h2 id="13-building-and-sharing-an-exe">13. Building and sharing an
+.exe</h2>
+<h3 id="131-building">13.1 Building</h3>
+<pre><code>pip install pyinstaller
+cd /d C:\FBCRS</code></pre>
+<p><strong>The main application</strong> — <code>--windowed</code>
+suppresses the console, since it has its own interface:</p>
+<pre><code>pyinstaller --onefile --windowed --name FBCRS_Analyzer FBCRS_Record_Inventory_V8_5.py</code></pre>
+<p><strong>The rulebook checker</strong> — <code>--console</code> here,
+<em>not</em> <code>--windowed</code>, because its output is the console
+window. Build it windowed and the findings go nowhere:</p>
+<pre><code>pyinstaller --onefile --console --name repair_rulebook repair_rulebook.py</code></pre>
+<p>Both results appear in <code>C:\FBCRS\dist\</code>.</p>
+<p>If <code>FBCRS_Analyzer.exe</code> builds but crashes on launch with
+a <code>customtkinter</code> path error, rebuild it with
+<code>--collect-all customtkinter</code> added.</p>
+<h3 id="132-packaging-for-colleagues">13.2 Packaging for colleagues</h3>
+<p>The rulebook is deliberately <strong>not</strong> bundled into the
+exe, so you can update keywords without rebuilding. Ship a folder:</p>
+<pre><code>FBCRS_Analyzer\
+├── FBCRS_Analyzer.exe          (the application)
+├── FBCRS_Master_Full.xlsx      (the rulebook)
+├── repair_rulebook.exe         (rulebook checker)
+└── FBCRS_User_Manual.pdf       (this manual)</code></pre>
+<p>Zip it. Tell recipients to unzip it and keep the files together — the
+exe cannot run without the rulebook beside it.</p>
+<h3 id="133-what-to-expect-on-their-machines">13.3 What to expect on
+their machines</h3>
+<p><strong>Reports save to their own Documents folder</strong>, not
+yours. Nothing is hardcoded to your user profile.</p>
+<p><strong>Windows SmartScreen and antivirus will likely
+complain.</strong> Unsigned PyInstaller executables routinely trigger
+"Windows protected your PC" warnings and are sometimes quarantined
+outright. This is a known false positive, but recipients will need to
+click through it — and on a locked-down corporate machine it may be
+blocked entirely. Warn people in advance, and check with IT before wide
+distribution.</p>
+<p><strong>Test on a machine without Python installed</strong> before
+sending it widely. An exe that works on the build machine can still be
+missing components that only surface on a clean one.</p>
+<hr />
+<h2 id="14-known-limitations">14. Known limitations</h2>
+<p><strong>Classification is keyword matching, not
+comprehension.</strong> No understanding of context, business purpose,
+or the difference between an official record and a working copy.</p>
+<p><strong>Retention runs from Date Modified, not file closure.</strong>
+See section 7.2.</p>
+<p><strong>Unparseable retention text produces no expiry date and a
+<code>WITHIN RETENTION</code> verdict.</strong> Blank expiry means
+<em>unknown</em>, not <em>current</em>.</p>
+<p><strong>Duplicate "keeper" selection is alphabetical.</strong> Not a
+judgement about which copy is authoritative. See section 8.2.</p>
+<p><strong>Only the beginning of each file is read</strong> — 10 PDF
+pages, 200 Word paragraphs, 500 spreadsheet rows per sheet, 100,000
+characters total. Content past those limits is invisible. Configurable,
+at a cost in speed.</p>
+<p><strong>Scanned documents and images are not OCR'd.</strong> A
+scanned PDF with no text layer yields no content, and classifies on
+filename alone.</p>
+<p><strong>Files over 15 MB are classified on filename
+only.</strong></p>
+<p><strong>Encrypted and password-protected files cannot be
+read.</strong> They appear with <code>Scan failed</code> in
+Comments.</p>
+<p><strong>Very long paths may fail on Windows.</strong> Paths beyond
+260 characters can produce <code>ACCESS DENIED</code> unless long path
+support is enabled. Excel also refuses hyperlinks over 255 characters,
+so those cells are left as plain text.</p>
+<p><strong>Duplicate detection is per-scan.</strong> No memory between
+runs.</p>
+<p><strong>Date Created is unreliable</strong> after files are copied or
+moved.</p>
+<hr />
+<h2 id="appendix-a--configuration-reference">Appendix A — configuration
+reference</h2>
+<p>All constants sit near the top of the script.</p>
+<h3 id="scoring">Scoring</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Constant</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>KW_BASE</code></td>
+<td>2.0</td>
+<td>Points per keyword match</td>
+</tr>
+<tr class="even">
+<td><code>PH_BASE</code></td>
+<td>10.0</td>
+<td>Points per phrase match</td>
+</tr>
+<tr class="odd">
+<td><code>FN_BOOST</code></td>
+<td>3.0</td>
+<td>Multiplier for filename matches</td>
+</tr>
+<tr class="even">
+<td><code>MAX_OWNERS</code></td>
+<td>20</td>
+<td>Terms claimed by more series than this are ignored</td>
+</tr>
+<tr class="odd">
+<td><code>MIN_SCORE</code></td>
+<td>2.0</td>
+<td>Below this → <code>UNCLASSIFIED</code></td>
+</tr>
+<tr class="even">
+<td><code>BODY_ONLY_MIN</code></td>
+<td>6.0</td>
+<td>Threshold when nothing matched in the filename</td>
+</tr>
+<tr class="odd">
+<td><code>CONF_BANDS</code></td>
+<td>30 / 12 / 4</td>
+<td>Very High / High / Medium cutoffs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="alternates">Alternates</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Constant</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>N_ALTERNATES</code></td>
+<td>3</td>
+<td>Number of runner-up columns</td>
+</tr>
+<tr class="even">
+<td><code>ALT_MIN_SCORE</code></td>
+<td>2.0</td>
+<td>Minimum score for a runner-up to be shown</td>
+</tr>
+<tr class="odd">
+<td><code>ALT_REL_MIN</code></td>
+<td>0.40</td>
+<td>Runner-up must reach this fraction of the winner. Set to
+<code>0.0</code> to always show three</td>
+</tr>
+</tbody>
+</table>
+<h3 id="reading-and-performance">Reading and performance</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Constant</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>MAX_WORKERS</code></td>
+<td><code>min(8, cores × 2)</code></td>
+<td>Parallel worker threads</td>
+</tr>
+<tr class="even">
+<td><code>TEXT_CAP</code></td>
+<td>100000</td>
+<td>Max characters fed to the matcher</td>
+</tr>
+<tr class="odd">
+<td><code>XLSX_ROWS</code></td>
+<td>500</td>
+<td>Rows read per sheet — <strong>largest speed lever</strong></td>
+</tr>
+<tr class="even">
+<td><code>XLSX_SHEETS</code></td>
+<td>3</td>
+<td>Sheets read per workbook</td>
+</tr>
+<tr class="odd">
+<td><code>PDF_PAGES</code></td>
+<td>10</td>
+<td>Pages read per PDF</td>
+</tr>
+<tr class="even">
+<td><code>DOCX_PARAS</code></td>
+<td>200</td>
+<td>Paragraphs read per Word file</td>
+</tr>
+<tr class="odd">
+<td><code>PPTX_SLIDES</code></td>
+<td>10</td>
+<td>Slides read per presentation</td>
+</tr>
+<tr class="even">
+<td><code>HASH_BYTES</code></td>
+<td>5 MB</td>
+<td>Bytes hashed for duplicate comparison</td>
+</tr>
+<tr class="odd">
+<td><code>MAX_SIZE_BYTES</code></td>
+<td>15 MB</td>
+<td>Above this, filename-only classification</td>
+</tr>
+</tbody>
+</table>
+<h3 id="file-handling">File handling</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Constant</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>SKIP_EXTS</code></td>
+<td><code>.jpg .jpeg .png .gif .bmp .tiff .mp4 .mov .avi .wmv .mkv .zip .7z .rar .exe .dll .msi</code></td>
+</tr>
+<tr class="even">
+<td><code>ACTION_OPTIONS</code></td>
+<td>The four Recommended Action values</td>
+</tr>
+<tr class="odd">
+<td><code>REASON_OPTIONS</code></td>
+<td>The seven Reason values</td>
+</tr>
+<tr class="even">
+<td><code>CONF_OPTIONS</code></td>
+<td>The four Confidence values</td>
+</tr>
+</tbody>
+</table>
+<p>Adding a value to <code>ACTION_OPTIONS</code>,
+<code>REASON_OPTIONS</code>, or <code>CONF_OPTIONS</code> automatically
+extends the corresponding Excel dropdown.</p>
+<blockquote>
+<p><strong>Note:</strong> <code>EXTS</code> exists in the code but is
+not used for filtering. Every file not in <code>SKIP_EXTS</code> is
+inventoried; content extraction simply only works for the supported
+types.</p>
+</blockquote>
+<hr />
+<h2 id="appendix-b--file-inventory">Appendix B — file inventory</h2>
+<table>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>FBCRS_Analyzer.exe</code></td>
+<td>The application</td>
+</tr>
+<tr class="even">
+<td><code>FBCRS_Master_Full.xlsx</code></td>
+<td>Classification rulebook — must sit beside the app</td>
+</tr>
+<tr class="odd">
+<td><code>repair_rulebook.exe</code></td>
+<td>Rulebook checker and Synonyms repair tool</td>
+</tr>
+</tbody>
+</table>
+<p>Source files, if you are running or rebuilding from Python rather
+than the exes:</p>
+<table>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Builds</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>FBCRS_Record_Inventory_V8_5.py</code></td>
+<td><code>FBCRS_Analyzer.exe</code></td>
+</tr>
+<tr class="even">
+<td><code>repair_rulebook.py</code></td>
+<td><code>repair_rulebook.exe</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="generated-output">Generated output</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Location</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Documents\FBCRS_Reports\&lt;folder&gt; summary &lt;timestamp&gt;.xlsx</code></td>
+<td>The report</td>
+</tr>
+<tr class="even">
+<td><code>&lt;rulebook&gt;_REPAIRED.xlsx</code></td>
+<td>Cleaned rulebook from <code>repair_rulebook.exe</code></td>
+</tr>
+<tr class="odd">
+<td><code>&lt;rulebook&gt;_AUDIT.txt</code></td>
+<td>Rulebook audit report</td>
+</tr>
+<tr class="even">
+<td><code>Documents\FBCRS_Reports\&lt;folder&gt;_&lt;timestamp&gt;_temp.csv</code></td>
+<td>Checkpoint; deleted on success, survives a crash</td>
+</tr>
+<tr class="odd">
+<td><code>Documents\FBCRS_Reports\FBCRS_error_log.txt</code></td>
+<td>Technical error log, appended to</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Version 8.5. This manual describes the tool's behaviour as built;
+it is not a records management policy document. Disposition decisions
+remain the responsibility of the reviewing records
+professional.</em></p>
+</body>
+</html>
