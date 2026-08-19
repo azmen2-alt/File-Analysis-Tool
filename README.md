@@ -251,69 +251,91 @@ When several rules could apply, the first match wins:
 
 ## 6. How classification works
 
-### 6.1 Scoring
+### 6.1 The evidentiary model
 
-Each file's filename and content are matched against the rulebook's keywords and
-phrases. Points accumulate per records series:
+Each file's name and content are evaluated against a **controlled taxonomy**
+maintained in the rulebook: single-word **index terms** and compound
+**descriptors** associated with each records series. Every match contributes
+weighted evidence toward that series:
 
-| Signal | Points |
+| Evidentiary signal | Weight |
 |---|---|
-| Keyword match | 2 |
-| Phrase match (multi-word) | 10 |
-| Match in the **filename** | × 3 |
+| Index term match | 2 |
+| Compound descriptor match | 10 |
+| Match located in the **file name** | × 3 |
 
-Filenames get triple weight because a filename is a deliberate human label,
-whereas body text is full of boilerplate.
+A compound descriptor carries five times the weight of a lone index term
+because specificity scales with it: "financial statements" identifies a series
+far more reliably than "financial" or "statements" in isolation. A match
+located in the file name carries triple weight because a file name is a
+deliberate label a person assigned, whereas body content is frequently
+generic.
 
-**Rarity weighting.** Each term's points are divided by the number of series that
-claim it. A keyword unique to one series contributes its full 2 points; a keyword
-shared by 20 series contributes 0.1. This is essential — auto-generated rulebooks
-tend to contain boilerplate terms attached to dozens of codes, which would
-otherwise swamp the real signal.
+**Inverse-frequency weighting.** Each term's contribution is divided by the
+number of series that claim it — the same principle underlying inverse-
+document-frequency weighting in information retrieval. A term unique to a
+single series retains its full weight; one claimed by twenty series
+contributes only a twentieth of it. This correction is what makes the model
+reliable at scale: the rulebook currently holds **249 records series described
+by 3,272 index terms and descriptors combined**. At that volume, generic
+language inevitably recurs across dozens of unrelated series — without
+inverse-frequency correction, that overlap would dominate the arithmetic and
+erase any genuine signal. The correction is precisely what lets a taxonomy this
+large remain discriminating rather than collapsing toward its most common
+terms.
 
-**Terms shared by more than 20 series are ignored entirely** as having no
-discriminating value.
+**Terms claimed by more than twenty series are excluded from scoring
+entirely**, on the basis that they carry no discriminative value at this
+scale.
 
-**Each distinct term counts once per field.** A document repeating "financial"
-400 times scores no higher than one mentioning it once.
+**Each distinct term is credited once per field, irrespective of repetition.**
+A document restating "financial" four hundred times earns no more evidentiary
+weight than one stating it once — frequency within a document is not mistaken
+for relevance.
 
 ### 6.2 Confidence bands
 
-| Score | Confidence | Typically means |
+| Aggregate score | Confidence | Typically indicates |
 |---|---|---|
-| 30 or more | Very High | An exact phrase matched in the filename |
+| 30 or more | Very High | An exact descriptor matched in the file name |
 | 12–29 | High | Several distinctive terms matched |
-| 4–11 | Medium | Moderate evidence |
-| below 4 | Low | Only weak or generic terms matched |
+| 4–11 | Medium | Moderate evidentiary support |
+| below 4 | Low | Only weak or non-discriminative terms matched |
 
-Confidence is downgraded to `Medium` when two series score within 15% of each
-other — a near-tie is not high confidence regardless of the raw score.
+Confidence is downgraded to `Medium` when two series score within 15% of one
+another — a near-tie does not constitute high confidence, regardless of the
+raw score.
 
-### 6.3 When the engine refuses to guess
+### 6.3 Abstention criteria — when the engine declines to classify
 
-A file becomes `UNCLASSIFIED` if:
+A file is returned as `UNCLASSIFIED` when the accumulated evidence does not
+meet a minimum evidentiary threshold:
 
-- **nothing matched** → *"No rulebook keywords or phrases found — context is not clear"*
+- **no evidence found** → *"No rulebook keywords or phrases found — context is not clear"*
 - **score below 2** → *"Only generic terms matched, shared across many series"*
-- **score below 6 with no filename support** → *"Weak match in document body only, nothing in the file name"*
+- **score below 6 with no file-name support** → *"Weak match in document body only, nothing in the file name"*
 
-**Expect a meaningful number of `UNCLASSIFIED` results, and treat that as the tool
-working correctly.** Refusing to guess is the point. A version that assigns a code
-to everything is not more accurate — it just hides its uncertainty, which is far
-more dangerous when the output drives destruction decisions.
+**Expect a meaningful proportion of `UNCLASSIFIED` results, and treat that as
+correct operation rather than a shortfall.** Declining to classify on
+insufficient evidence is a deliberate design choice. A model that assigns a
+series to every file is not thereby more accurate — it simply conceals its own
+uncertainty, which is considerably more hazardous when the output informs
+destruction decisions.
 
-### 6.4 Alternate codes (S–U)
+### 6.4 Alternate code candidates (columns S–U)
 
-Runner-up codes appear only when genuinely competitive: within 40% of the winning
-score, and scoring at least 2 in their own right.
+A runner-up series is surfaced only when it is genuinely competitive with the
+leading result: within 40% of the top score, and reaching a minimum
+evidentiary threshold of 2 in its own right.
 
-This means **high-confidence rows usually show no alternates at all**, which is
-intentional. Listing second, third, and fourth place unconditionally would hand
-reviewers three plausible-looking wrong answers on every clear match, and people
-do pick them.
+Consequently, **high-confidence determinations typically carry no alternate
+candidates**, which is by design. Surfacing the second, third, and fourth-place
+series unconditionally would present reviewers with three plausible-looking
+incorrect options alongside every clear-cut match — and in practice, reviewers
+select them.
 
-Alternates are always blank for `UNCLASSIFIED` files — if the top match is noise,
-so are the runners-up.
+Alternate candidates are always blank for `UNCLASSIFIED` files: if the leading
+result reflects noise rather than evidence, so do the candidates beneath it.
 
 ---
 
@@ -362,9 +384,6 @@ Duplicates are found in two stages. First, file **sizes** are compared — ident
 files must have identical sizes, so this eliminates almost everything without
 reading any file content. Only files whose size collides with another are then
 **hashed** (SHA-256 over the first 5 MB).
-
-This is why scans are fast: on a typical folder, only a small percentage of files
-are ever opened for hashing.
 
 ### 8.2 Which copy gets flagged
 
